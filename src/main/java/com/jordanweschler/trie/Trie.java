@@ -3,16 +3,10 @@ package com.jordanweschler.trie;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-/**
- * Currently the Trie class relies on the default of 26 for the alphabet.
- * There are no plans to change this, and as such storing the specific character
- * is not needed. a-z maps 0-25 and can easily be computed as such with a lighter
- * memory footprint
- */
 public class Trie {
 
-    // Contant for all 26 lowercase english letters
-    private static final int DEFAULT_ALPHABET_SIZE = 26;
+    // 128 is the base ASCII table
+    private static final int DEFAULT_ALPHABET_SIZE = 128;
 
     private static final char[] LOWERCASE_LETTERS =
             {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -66,7 +60,7 @@ public class Trie {
         Trie current = this;
 
         for (int stringIndex = 0; stringIndex < base.length(); stringIndex++) {
-            int trieIndex = base.charAt(stringIndex) - 97;
+            int trieIndex = (int) base.charAt(stringIndex);
 
             if (current.children[trieIndex] != null) {
                 current = current.children[trieIndex];
@@ -103,8 +97,8 @@ public class Trie {
     private void predictionHelper(PriorityQueue<Node> predictions, String base) {
         for (int i = 0; i < alphabetSize; i++) {
             if (children[i] != null) {
-                predictions.add(new Node(base + LOWERCASE_LETTERS[i], children[i].confidence));
-                children[i].predictionHelper(predictions, base + LOWERCASE_LETTERS[i]);
+                predictions.add(new Node(base + (char) i, children[i].confidence));
+                children[i].predictionHelper(predictions, base + (char) i);
             }
         }
     }
@@ -115,7 +109,7 @@ public class Trie {
      * @param key
      */
     public void insert(String key) {
-        int c = ((int) key.charAt(0)) - 97;
+        int c = (int) key.charAt(0);
 
         if (children[c] == null) {
             children[c] = new Trie(alphabetSize);
@@ -137,7 +131,7 @@ public class Trie {
 
         for (int i = 0; i < alphabetSize; i++) {
             if (children[i] != null) {
-                sb.append(LOWERCASE_LETTERS[i]);
+                sb.append((char) i);
                 sb.append(children[i].confidence);
                 sb.append(" ");
                 sb.append(children[i].toString());

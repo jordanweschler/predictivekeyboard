@@ -19,7 +19,7 @@ public class TrieController {
      * @param character technically doesn't need to be a single character
      * @return
      */
-    public String[] addCharacter(String character) {
+    public String[] addCharacter(char character) {
         currentWord.append(character);
 
         return predictions();

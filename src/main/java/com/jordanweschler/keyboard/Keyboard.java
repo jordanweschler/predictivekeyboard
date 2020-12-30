@@ -1,14 +1,11 @@
 package com.jordanweschler.keyboard;
 
-import com.jordanweschler.trie.Trie;
-
 import com.jordanweschler.trie.TrieController;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.BorderPane;
@@ -56,7 +53,7 @@ public class Keyboard extends Application {
         textBox = new TextArea();
         textBox.setPrefWidth(TEXT_BOX_WIDTH);
         textBox.setPrefHeight(TEXT_BOX_HEIGHT);
-        textBox.setOnKeyReleased(new TextInputParser());
+        textBox.setOnKeyTyped(new TextInputParser());
 
         textPane = new FlowPane(textBox);
 
@@ -87,15 +84,28 @@ public class Keyboard extends Application {
         public void handle(KeyEvent key) {
             String[] predictions;
 
-            if (key.getCode() == KeyCode.SPACE || key.getCode() == KeyCode.ENTER) {
+            System.out.println((int) key.getCharacter().charAt(0));
+
+            if (endOfWord((int) key.getCharacter().charAt(0))) {
                 predictions = predictionController.newWord();
             } else {
-                predictions = predictionController.addCharacter(key.getText());
+                predictions = predictionController.addCharacter(key.getCharacter().charAt(0));
             }
 
             prediction1.setText(predictions[0]);
             prediction2.setText(predictions[1]);
             prediction3.setText(predictions[2]);
+        }
+
+        private boolean endOfWord(int charInt) {
+            switch (charInt) {
+                case 10:
+                case 13:
+                case 32:
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }
