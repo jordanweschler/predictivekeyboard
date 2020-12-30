@@ -25,9 +25,23 @@ public class TrieController {
         return predictions();
     }
 
+    /**
+     * Called when a backspace is entered
+     * @return
+     */
+    public String[] removeCharacter() {
+        if (currentWord.length() > 0) {
+            currentWord.setLength(currentWord.length() - 1);
+        }
+
+        return predictions();
+    }
+
     public String[] newWord() {
-        trie.insert(currentWord.toString());
-        currentWord = new StringBuilder();
+        if (currentWord.length() > 0) {
+            trie.insert(currentWord.toString());
+            currentWord = new StringBuilder();
+        }
 
         return predictions();
     }

@@ -88,6 +88,8 @@ public class Keyboard extends Application {
 
             if (endOfWord((int) key.getCharacter().charAt(0))) {
                 predictions = predictionController.newWord();
+            } else if ((int) key.getCharacter().charAt(0) == 8) {
+                predictions = predictionController.removeCharacter();
             } else {
                 predictions = predictionController.addCharacter(key.getCharacter().charAt(0));
             }
@@ -99,9 +101,16 @@ public class Keyboard extends Application {
 
         private boolean endOfWord(int charInt) {
             switch (charInt) {
+                case 9:
                 case 10:
                 case 13:
                 case 32:
+                case 33:
+                case 44:
+                case 46:
+                case 58:
+                case 59:
+                case 63:
                     return true;
                 default:
                     return false;
