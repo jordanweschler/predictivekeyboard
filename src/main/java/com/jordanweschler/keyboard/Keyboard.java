@@ -2,11 +2,14 @@ package com.jordanweschler.keyboard;
 
 import com.jordanweschler.trie.Trie;
 
+import com.jordanweschler.trie.TrieController;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
@@ -34,9 +37,13 @@ public class Keyboard extends Application {
     private TextArea textBox;
     private Button prediction1, prediction2, prediction3;
 
+    private TrieController predictionController;
+
 
     @Override
     public void start(Stage stage) {
+        predictionController = new TrieController();
+
         prediction1 = createButton(PREDICTION_BUTTON_WIDTH, PREDICTION_BUTTON_HEIGHT);
         prediction2 = createButton(PREDICTION_BUTTON_WIDTH, PREDICTION_BUTTON_HEIGHT);
         prediction3 = createButton(PREDICTION_BUTTON_WIDTH, PREDICTION_BUTTON_HEIGHT);
@@ -49,6 +56,7 @@ public class Keyboard extends Application {
         textBox = new TextArea();
         textBox.setPrefWidth(TEXT_BOX_WIDTH);
         textBox.setPrefHeight(TEXT_BOX_HEIGHT);
+        textBox.setOnKeyReleased(new TextInputParser());
 
         textPane = new FlowPane(textBox);
 
@@ -74,5 +82,20 @@ public class Keyboard extends Application {
         return button;
     }
 
+    private class TextInputParser implements EventHandler<KeyEvent> {
+        @Override
+        public void handle(KeyEvent key) {
+            String[] predictions;
 
+            if (key.getCode() == KeyCode.SPACE || key.getCode() == KeyCode.ENTER) {
+                predictions = predictionController.newWord();
+            } else {
+                predictions = predictionController.addCharacter(key.getText());
+            }
+
+            prediction1.setText(predictions[0]);
+            prediction2.setText(predictions[1]);
+            prediction3.setText(predictions[2]);
+        }
+    }
 }

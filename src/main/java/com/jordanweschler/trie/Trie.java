@@ -1,5 +1,8 @@
 package com.jordanweschler.trie;
 
+import java.util.Comparator;
+import java.util.PriorityQueue;
+
 /**
  * Currently the Trie class relies on the default of 26 for the alphabet.
  * There are no plans to change this, and as such storing the specific character
@@ -19,6 +22,25 @@ public class Trie {
     private Trie[] children;
     private int confidence;
 
+    /**
+     * Node class for PriorityQueue
+     */
+    private class Node {
+        int confidence;
+        String word;
+
+        Node (String word, int confidence) {
+            this.word = word;
+            this.confidence = confidence;
+        }
+    }
+
+    private class NodeComparator implements Comparator<Node> {
+        public int compare(Node n1, Node n2) {
+            return n2.confidence - n1.confidence;
+        }
+    }
+
     public Trie() {
         this(DEFAULT_ALPHABET_SIZE);
     }
@@ -32,6 +54,59 @@ public class Trie {
         this.alphabetSize = alphabetSize;
         children = new Trie[alphabetSize];
         confidence = 0;
+    }
+
+    /**
+     *
+     * @param base
+     * @param predictionCount
+     * @return
+     */
+    public String[] getPredictions(String base, int predictionCount) {
+        Trie current = this;
+
+        for (int stringIndex = 0; stringIndex < base.length(); stringIndex++) {
+            int trieIndex = base.charAt(stringIndex) - 97;
+
+            if (current.children[trieIndex] != null) {
+                current = current.children[trieIndex];
+            } else {
+                current = null;
+                break;
+            }
+        }
+
+        String[] predictions = new String[predictionCount];
+
+        if (current != null) {
+            PriorityQueue<Node> potentialWords = new PriorityQueue<Node>(new NodeComparator());
+
+            current.predictionHelper(potentialWords, base);
+
+            for (int i = 0; i < predictionCount; i++) {
+                if (potentialWords.peek() != null && potentialWords.peek().confidence > 0) {
+                    predictions[i] = potentialWords.poll().word;
+                } else {
+                    predictions[i] = "";
+                }
+            }
+
+        } else {
+            for (int i = 0; i < predictionCount; i++) {
+                predictions[i] = "";
+            }
+        }
+
+        return predictions;
+    }
+
+    private void predictionHelper(PriorityQueue<Node> predictions, String base) {
+        for (int i = 0; i < alphabetSize; i++) {
+            if (children[i] != null) {
+                predictions.add(new Node(base + LOWERCASE_LETTERS[i], children[i].confidence));
+                children[i].predictionHelper(predictions, base + LOWERCASE_LETTERS[i]);
+            }
+        }
     }
 
     /**
